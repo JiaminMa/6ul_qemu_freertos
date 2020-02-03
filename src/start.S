@@ -1,118 +1,179 @@
+/* ---------------------------------------------------------------------------------------*/
+/*  @file:    startup_MCIMX6Y2.S                                                          */
+/*  @purpose: CMSIS Cortex-A7 Core Device Startup File                                    */
+/*            MCIMX6Y2                                                                    */
+/*  @version:  2.0                                                                        */
+/*  @date:     2016-8-24                                                                  */
+/*  @build:   b160722                                                                     */
+/* ---------------------------------------------------------------------------------------*/
+/*                                                                                        */
+/* Copyright (c) 1997 - 2016 , Freescale Semiconductor, Inc.                              */
+/* All rights reserved.                                                                   */
+/*                                                                                        */
+/* Redistribution and use in source and binary forms, with or without modification,       */
+/* are permitted provided that the following conditions are met:                          */
+/*                                                                                        */
+/* o Redistributions of source code must retain the above copyright notice, this list     */
+/*   of conditions and the following disclaimer.                                          */
+/*                                                                                        */
+/* o Redistributions in binary form must reproduce the above copyright notice, this       */
+/*   list of conditions and the following disclaimer in the documentation and/or          */
+/*   other materials provided with the distribution.                                      */
+/*                                                                                        */
+/* o Neither the name of copyright holder nor the names of its               */
+/*   contributors may be used to endorse or promote products derived from this            */
+/*   software without specific prior written permission.                                  */
+/*                                                                                        */
+/* THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND        */
+/* ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED          */
+/* WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE                 */
+/* DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR       */
+/* ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES         */
+/* (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;           */
+/* LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON         */
+/* ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT                */
+/* (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS          */
+/* SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.                           */
+/*****************************************************************************/
+/* Version: GCC for ARM Embedded Processors                                  */
+/*****************************************************************************/
+    .syntax unified
+    .arch armv7-a
 
-.global _start
+    .section .isr_vector, "a"
+    .align 2
+    .globl __isr_vector
+__isr_vector:
+    ldr     pc, =Reset_Handler           /* Reset                  */
+    ldr     pc, =Undefined_Handler       /* Undefined instructions */
+    ldr     pc, =FreeRTOS_SWI_Handler             /* Supervisor Call        */
+    ldr     pc, =PrefAbort_Handler       /* Prefetch abort         */
+    ldr     pc, =DataAbort_Handler       /* Data abort             */
+    .word   0                            /* RESERVED               */
+    ldr     pc, =FreeRTOS_IRQ_Handler             /* IRQ interrupt          */
+    ldr     pc, =FIQ_Handler             /* FIQ interrupt          */
 
-_start:
-    ldr pc, =Reset_Handler
-    ldr pc, =Undefined_Handler 
-    ldr pc, =SVC_Handler
-    ldr pc, =PreAbort_Handler
-    ldr pc, =DataAbort_Handler
-    ldr pc, =NotUsed_Handler
-    ldr pc, =IRQ_Handler
-    ldr pc, =FIQ_Handler
+    .size    __isr_vector, . - __isr_vector
 
+    .text
+    .arm
+
+/* Reset Handler */
+
+    .arm
+    .align 2
+    .globl   Reset_Handler
+    .weak    Reset_Handler
+    .type    Reset_Handler, %function
 Reset_Handler:
+    cpsid   i               /* Mask interrupts */
 
-    cpsid i 
+    /* Reset SCTlr Settings */
+    mrc     p15, 0, r0, c1, c0, 0     /* Read CP15 System Control register                  */
+    bic     r0,  r0, #(0x1 << 12)     /* Clear I bit 12 to disable I Cache                  */
+    bic     r0,  r0, #(0x1 <<  2)     /* Clear C bit  2 to disable D Cache                  */
+    bic     r0,  r0, #0x2             /* Clear A bit  1 to disable strict alignment         */
+    bic     r0,  r0, #(0x1 << 11)     /* Clear Z bit 11 to disable branch prediction        */
+    bic     r0,  r0, #0x1             /* Clear M bit  0 to disable MMU                      */
+    mcr     p15, 0, r0, c1, c0, 0     /* Write value back to CP15 System Control register   */
 
-    MRC p15, 0, r0, c1, c0, 0 
-    bic r0, r0, #(1 << 12)      /* Disable I Cache */
-    bic r0, r0, #(1 << 11)      /* Disable branch prediction */
-    bic r0, r0, #(1 << 2)       /* Disable D Cache*/
-    bic r0, r0, #(1 << 1)       /* Disable Alignment */
-    bic r0, r0, #(1 << 0)       /* Disable MMU */
-    MCR p15, 0, r0, c1, c0, 0
+    /* Set up stack for IRQ, System/User and Supervisor Modes */
+    cps     #0x12                /* Enter IRQ mode                */
+    ldr     sp, =__IStackTop     /* Set up IRQ handler stack      */
 
+    cps     #0x1F                /* Enter System mode             */
+    ldr     sp, =__CStackTop     /* Set up System/User Mode stack */
 
+    cps     #0x13                /* Enter Supervisor mode         */
+    ldr     sp, =__CStackTop     /* Set up Supervisor Mode stack  */
 
-    /* 设置处理器进入IRQ模式 */
-    mrs r0, cpsr        /* 读取cpsr到r0*/
-    bic r0, r0, #0x1f   /* 清除cpsr的bit4-0*/
-    orr r0, r0, #0x12   /* 使用IRQ模式*/
-    msr cpsr, r0        /* 将r0写入到cpsr*/
-    ldr sp, =irq_stack_top /* 设置IRQ模式下的sp*/
+    cpsie   i                    /* Unmask interrupts             */
 
-    /* 设置处理器进入SYS模式 */
-    mrs r0, cpsr        /* 读取cpsr到r0*/
-    bic r0, r0, #0x1f   /* 清除cpsr的bit4-0*/
-    orr r0, r0, #0x1f   /* 使用SYS模式*/
-    msr cpsr, r0        /* 将r0写入到cpsr*/
-    ldr sp, =sys_stack_top /* 设置SYS模式下的sp*/
+    ldr   r0,=main
+    bx    r0
+    .pool
+    .size Reset_Handler, . - Reset_Handler
 
-    /* 设置处理器进入SVC模式 */
-    mrs r0, cpsr        /* 读取cpsr到r0*/
-    bic r0, r0, #0x1f   /* 清除cpsr的bit4-0*/
-    orr r0, r0, #0x13   /* 使用SVC模式*/
-    msr cpsr, r0        /* 将r0写入到cpsr*/
-    ldr sp, =svc_stack_top /* 设置SVC模式下的sp*/
-
-    cpsie i             /* 打开IRQ */
-    b main              /* 跳转到C语言main函数*/
-
-
-/* 未定义指令中断服务函数 */
+    .align  2
+    .arm
+    .weak Undefined_Handler
+    .type Undefined_Handler, %function
 Undefined_Handler:
-    ldr r0, =Undefined_Handler
-    bx r0
+    b Undefined_Handler
+    .size Undefined_Handler, . - Undefined_Handler
 
-/* SVC中断服务函数 */
-SVC_Handler:  
-    ldr r0, =SVC_Handler
-    bx r0
+    .align 2
+    .arm
+    .weak SVC_Handler
+    .type SVC_Handler, %function
+SVC_Handler:
+    ldr   r0,=SVC_Handler
+    bx    r0
+    .size SVC_Handler, . - SVC_Handler
 
-/* 预取终止中断服务函数 */   
-PreAbort_Handler:
-    ldr r0, =PreAbort_Handler
-    bx r0
+    .align 2
+    .arm
+    .weak PrefAbort_Handler
+    .type PrefAbort_Handler, %function
+PrefAbort_Handler:
+    ldr   r0,=PrefAbort_Handler
+    bx    r0
+    .size PrefAbort_Handler, . - PrefAbort_Handler
 
-/* 数据终止中断服务函数 */    
+    .align 2
+    .arm
+    .weak DataAbort_Handler
+    .type DataAbort_Handler, %function
 DataAbort_Handler:
-    ldr r0, =DataAbort_Handler
-    bx r0
+    ldr   r0,=DataAbort_Handler
+    bx    r0
+    .size DataAbort_Handler, . - DataAbort_Handler
 
-/* 未使用 */    
-NotUsed_Handler:
-    ldr r0, =NotUsed_Handler
-    bx r0
-
-/* IRQ中断服务函数 */
+    .align 2
+    .arm
+    .weak IRQ_Handler
+    .type IRQ_Handler, %function
 IRQ_Handler:
-	push {lr}					/* 保存lr地址 */
-	push {r0-r3, r12}			/* 保存r0-r3，r12寄存器 */
+    push    {lr}                         /* Save return address+4                                */
+    push    {r0-r3, r12}                 /* Push caller save registers                           */
 
-	mrs r0, spsr				/* 读取spsr寄存器 */
-	push {r0}					/* 保存spsr寄存器 */
+    MRS     r0, spsr                     /* Save SPRS to allow interrupt reentry                 */
+    push    {r0}
 
-	ldr r1, =0xA00000
-    add r1, r1, #0X2000			/* GIC基地址加0X2000，也就是GIC的CPU接口端基地址 */
-	ldr r0, [r1, #0XC]			/* GIC的CPU接口端基地址加0X0C就是GICC_IAR寄存器，
-								 * GICC_IAR寄存器保存这当前发生中断的中断号，我们要根据
-								 * 这个中断号来绝对调用哪个中断服务函数
-								 */
-	push {r0, r1}				/* 保存r0,r1 */
-	
-	cps #0x13					/* 进入SVC模式，允许其他中断再次进去 */
-	
-	push {lr}					/* 保存SVC模式的lr寄存器 */
-	ldr r2, =system_irqhandler	/* 加载C语言中断处理函数到r2寄存器中*/
-	blx r2						/* 运行C语言中断处理函数，带有一个参数，保存在R0寄存器中 */
+    MRC     P15, 4, r1, C15, C0, 0       /* Get GIC base address                                 */
+    ADD     r1, r1, #0x2000              /* r1: GICC base address                                */
+    LDR     r0, [r1, #0xC]               /* r0: IAR                                              */
 
-	pop {lr}					/* 执行完C语言中断服务函数，lr出栈 */
-	cps #0x12					/* 进入IRQ模式 */
-	pop {r0, r1}				
-	str r0, [r1, #0X10]			/* 中断执行完成，写EOIR */
+    push    {r0, r1}
 
-	pop {r0}						
-	msr spsr_cxsf, r0			/* 恢复spsr */
+    CPS     #0x13                        /* Change to Supervisor mode to allow interrupt reentry */
 
-	pop {r0-r3, r12}			/* r0-r3,r12出栈 */
-	pop {lr}					/* lr出栈 */
-	subs pc, lr, #4				/* 将lr-4赋给pc */
-	
+    push    {lr}                         /* Save Supervisor lr                                   */
+    LDR     r2, =SystemIrqHandler
+    BLX     r2                           /* Call SystemIrqHandler with param GCC                 */
+    POP     {lr}
 
-/* FIQ中断服务函数 */
+    CPS     #0x12                        /* Back to IRQ mode                                     */
+
+    POP     {r0, r1}
+
+    STR     r0, [r1, #0x10]              /* Now IRQ handler finished: write to EOIR              */
+
+    POP     {r0}
+    MSR     spsr_cxsf, r0
+
+    POP     {r0-r3, r12}
+    POP     {lr}
+    SUBS    pc, lr, #4
+    .size IRQ_Handler, . - IRQ_Handler
+
+    .align 2
+    .arm
+    .weak FIQ_Handler
+    .type FIQ_Handler, %function
 FIQ_Handler:
-    ldr r0, =FIQ_Handler
-    bx r0
+    ldr   r0,=FIQ_Handler
+    bx    r0
+    .size FIQ_Handler, . - FIQ_Handler
 
-
+    .end

@@ -1,5 +1,6 @@
-#include <stdarg.h>
-#include <stdint.h>
+#include <print.h>
+
+static SemaphoreHandle_t sPrintMutex;
 
 typedef struct {
     volatile uint32_t uart_rx_reg;
@@ -31,8 +32,9 @@ char uart_putc(unsigned char ch)
     return ch;
 }
 
-void print_init()
+bool print_init()
 {
+    bool ret = true;
     imx_uart0 = (imx_uart_t *)0x02020000;
 
     /* shutdown CSI*/
@@ -60,11 +62,22 @@ void print_init()
     imx_uart0->uart_control_reg2 &= ~0x00000100;
     imx_uart0->uart_control_reg2 &= ~0x00000040;
     imx_uart0->uart_control_reg2 &= ~0x00000020;
+    
+    sPrintMutex = xSemaphoreCreateMutex();
+    if (sPrintMutex == NULL) {
+        ret = false;
+    } else {
+        ret = true;
+    }
+
+    return ret;
 }
 
 char send_char(uint8_t *ch)
 {
-    return uart_putc(*ch);
+    char ret = 0;
+    ret =  uart_putc(*ch);
+    return ret;
 }
 
 const char hex_asc_table[16] =
@@ -252,7 +265,8 @@ void trace(const char *fmt, ...)
     char c;
     uint32_t width = 0;
     va_list argptr;
-
+    
+    xSemaphoreTake(sPrintMutex, portMAX_DELAY);
     va_start(argptr, fmt);
     do {
         c = *fmt;
@@ -297,4 +311,6 @@ void trace(const char *fmt, ...)
     while (*fmt != '\0');
 
     va_end(argptr);
+    xSemaphoreGive(sPrintMutex);
+
 }
