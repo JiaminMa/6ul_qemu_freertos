@@ -15,4 +15,6 @@ extern void uart_task(void *);
 
 extern void epit1_task(void *);
 
+extern void hello_task2(void *);
+extern void hello_task1(void *);
 #endif

@@ -10,10 +10,12 @@
 #include <app.h>
 #include <core_ca7.h>
 
-#define hello_task_PRIORITY (configMAX_PRIORITIES - 1)
-static void hello_task(void *pvParameters);
-static void hello_task2(void *pvParameters);
-void epit_task(void *pvParamters);
+typedef struct task_desc_tag {
+    void (*entry)(void *);
+    char *name;
+    int prio;
+    uint32_t stack_size;
+} task_desc_t;
 
 void vApplicationIRQHandler(uint32_t ulICCIAR)
 {
@@ -28,8 +30,42 @@ void data_section_init()
     memcpy((void *)dst, (void *)src, len);
 }
 
+static task_desc_t tasks[] = {
+    {
+        hello_task1,
+        "hello_task1",
+        configMAX_PRIORITIES - 1,
+        128,
+    },
+
+    {
+        hello_task2,
+        "hello_task2",
+        configMAX_PRIORITIES - 1,
+        128,
+    }, 
+
+    {
+        epit1_task,
+        "epit1_task",
+        configMAX_PRIORITIES - 1,
+        128,
+    },
+
+    {
+        NULL,
+        NULL,
+        0,
+        0,
+    }
+};
+
 int main(void)
 {
+    uint32_t i = 0;
+
+
+
     /* don't touch any global variable before here */
     data_section_init();
 
@@ -44,47 +80,23 @@ int main(void)
         while(1);
     }
 
-    if (xTaskCreate(hello_task, "Hello_task", configMINIMAL_STACK_SIZE + 10, 
-                NULL, hello_task_PRIORITY, NULL) != pdPASS) {
-        trace("Task creation failed!.\n");
-        while (1)
-            ;
-    }
-
-    if (xTaskCreate(hello_task2, "Hello_task2", configMINIMAL_STACK_SIZE + 10, 
-                NULL, hello_task_PRIORITY, NULL) != pdPASS) {
-        trace("Task creation failed!.\n");
-        while (1)
-            ;
-    }
-
-    if (xTaskCreate(epit1_task, "epit1_task", 128, 
-                NULL, hello_task_PRIORITY, NULL) != pdPASS) {
-        trace("Task creation failed!.\n");
-        while (1)
-            ;
+    while (tasks[i].entry != NULL) {
+        if (xTaskCreate(tasks[i].entry, 
+                        tasks[i].name, 
+                        tasks[i].stack_size,  
+                        NULL, 
+                        tasks[i].prio, 
+                        NULL) != pdPASS) {
+            trace("%s creation failed!.\n", tasks[i].name);
+            while (1);
+        } else {
+             trace("%s creation success!.\n", tasks[i].name);
+        }
+        i++;
     }
 
  
     vTaskStartScheduler();
     for (;;);
-}
-
-static void hello_task2(void *pvParameters)
-{
-    uint32_t i = 0;
-    for (;;) {
-        trace("%s:%d\n", __func__, i++);
-        vTaskDelay(1000);
-    }
-}
-
-static void hello_task(void *pvParameters)
-{
-    uint32_t i = 0;
-    for (;;) {
-        trace("%s:%d\n", __func__, i++);
-        vTaskDelay(1000);
-    }
 }
 

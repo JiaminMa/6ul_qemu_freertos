@@ -25,3 +25,6 @@ hello_task2:7
 ```
 
 # How to debug
+
+make debug all
+cgdb -d arm-linux-gdb 6ul_freertos.elf

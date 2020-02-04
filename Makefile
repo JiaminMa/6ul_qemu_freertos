@@ -60,7 +60,7 @@ debug: $(OBJS)
 			-kernel 6ul_freertos.elf -nographic -serial mon:stdio -s -S
 
 clean:
-	rm -rf $(TARGET).elf $(TARGET).bin $(TARGET).dis $(OBJS)
+	rm -rf $(TARGET).elf $(TARGET).bin $(TARGET).dis $(OBJS) *.lst
 
 print:
 	@echo INCLUDE = $(INCLUDE)
