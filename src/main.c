@@ -53,6 +53,13 @@ static task_desc_t tasks[] = {
     },
 
     {
+        uart1_task,
+        "uart1_task",
+        configMAX_PRIORITIES - 1,
+        128,
+    },
+
+    {
         NULL,
         NULL,
         0,
@@ -63,8 +70,6 @@ static task_desc_t tasks[] = {
 int main(void)
 {
     uint32_t i = 0;
-
-
 
     /* don't touch any global variable before here */
     data_section_init();
@@ -94,7 +99,6 @@ int main(void)
         }
         i++;
     }
-
  
     vTaskStartScheduler();
     for (;;);
