@@ -50,10 +50,10 @@
 /* Entry Point */
 ENTRY(Reset_Handler)
 
-HEAP_SIZE   = DEFINED(__heap_size__)           ? __heap_size__          : 0x0400;
-ISTACK_SIZE = DEFINED(__irq_stack_size__)      ? __irq_stack_size__     : 0x0400;
-CSTACK_SIZE = DEFINED(__stack_size__)          ? __stack_size__         : 0x0400;
-RSTACK_SIZE = DEFINED(__resume_stack_size__)   ? __resume_stack_size__  : 0x0400;
+HEAP_SIZE   = DEFINED(__heap_size__)           ? __heap_size__          : 0x4000;
+ISTACK_SIZE = DEFINED(__irq_stack_size__)      ? __irq_stack_size__     : 0x4000;
+CSTACK_SIZE = DEFINED(__stack_size__)          ? __stack_size__         : 0x4000;
+RSTACK_SIZE = DEFINED(__resume_stack_size__)   ? __resume_stack_size__  : 0x4000;
 
 /* Specify the memory areas */
 MEMORY
@@ -183,6 +183,7 @@ SECTIONS
     *(.data*)                     /* .data* sections */
     KEEP(*(.jcr*))
     . = ALIGN(4);
+    *(.got)
     __data_end__ = .;             /* define a global symbol at data end */
   } > m_data
 

@@ -312,5 +312,4 @@ void trace(const char *fmt, ...)
 
     va_end(argptr);
     xSemaphoreGive(sPrintMutex);
-
 }

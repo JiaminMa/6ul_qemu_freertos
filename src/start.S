@@ -51,6 +51,7 @@ __isr_vector:
     ldr     pc, =DataAbort_Handler       /* Data abort             */
     .word   0                            /* RESERVED               */
     ldr     pc, =FreeRTOS_IRQ_Handler             /* IRQ interrupt          */
+    @ ldr     pc, =SVC_Handler
     ldr     pc, =FIQ_Handler             /* FIQ interrupt          */
 
     .size    __isr_vector, . - __isr_vector
@@ -59,6 +60,15 @@ __isr_vector:
     .arm
 
 /* Reset Handler */
+.global __data_end
+.global __data_start
+.global __rom_data_start
+__rom_data_start:
+    .word __DATA_ROM
+__data_start:
+    .word __data_start__
+__data_end:
+    .word __data_end__
 
     .arm
     .align 2
@@ -88,6 +98,7 @@ Reset_Handler:
     ldr     sp, =__CStackTop     /* Set up Supervisor Mode stack  */
 
     cpsie   i                    /* Unmask interrupts             */
+
 
     ldr   r0,=main
     bx    r0

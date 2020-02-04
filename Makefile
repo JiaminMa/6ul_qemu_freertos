@@ -13,7 +13,7 @@ INCUDIRS		:= 	include \
 
 SRCDIRS			:= 	src \
 					src/driver \
-					src/driver/sdk \
+					src/app	\
 					src/freertos/Source
 
 INCLUDE 		:= 	$(patsubst %, -I %, $(INCUDIRS))
@@ -38,7 +38,8 @@ VPATH			:= $(SRCDIRS)
 $(TARGET).bin : $(OBJS)
 	$(LD) -Tsrc/6ul_freertos.ld  -o $(TARGET).elf $^
 	$(OBJCOPY) -O binary -S $(TARGET).elf $@
-	$(OBJDUMP) -D -m arm $(TARGET).elf > $(TARGET).dis
+	$(OBJDUMP) -D -S -m arm $(TARGET).elf > $(TARGET).dis
+	$(OBJDUMP) -D -m arm $(TARGET).elf > $(TARGET).lst
 
 $(SOBJS) : obj/%.o : %.S
 	$(CC) -Wall -nostdlib -c -g -O0 -mno-unaligned-access -Wall -mfloat-abi=hard -mfpu=vfpv4 -MMD -MP -fno-common -ffunction-sections -fdata-sections -ffreestanding -fno-builtin -mapcs -std=gnu99 -mcpu=cortex-a7 $(INCLUDE) -o $@ $<

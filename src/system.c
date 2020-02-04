@@ -307,14 +307,8 @@ void SystemInstallIrqHandler(IRQn_Type irq, system_irq_handler_t handler, void *
    -- SystemIrqHandler()
    ---------------------------------------------------------------------------- */
 
-#if defined(__IAR_SYSTEMS_ICC__)
-#pragma weak SystemIrqHandler
-void SystemIrqHandler(uint32_t giccIar) {
-#elif defined(__GNUC__)
 __attribute__((weak)) void SystemIrqHandler(uint32_t giccIar) {
-#else
-  #error Not supported compiler type
-#endif
+
   uint32_t intNum = giccIar & 0x3FFUL;
 
   /* Spurious interrupt ID or Wrong interrupt number */
