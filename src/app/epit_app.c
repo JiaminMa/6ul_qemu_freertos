@@ -1,12 +1,4 @@
-#include <stdarg.h>
-#include <stdint.h>
-#include <FreeRTOS.h>
-#include <stdbool.h>
-#include <semphr.h>
-#include <system.h>
-#include <core_ca7.h>
-#include <task.h>
-#include <fsl_debug_console.h>
+#include <app.h>
 
 static bool s_is_epit_flag;
 static uint32_t s_epit1_counter;

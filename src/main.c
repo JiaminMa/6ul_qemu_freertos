@@ -1,21 +1,11 @@
-#include <FreeRTOS.h>
-#include <task.h>
-#include <queue.h>
-#include <timers.h>
-#include <fsl_device_registers.h>
-#include <fsl_common.h>
-#include <stdarg.h>
-#include <stdint.h>
-#include <fsl_debug_console.h>
 #include <app.h>
-#include <core_ca7.h>
-
 
 typedef struct task_desc_tag {
     void (*entry)(void *);
     char *name;
     int prio;
     uint32_t stack_size;
+    TaskHandle_t *task_handle_p;
 } task_desc_t;
 
 void vApplicationIRQHandler(uint32_t ulICCIAR)
@@ -34,33 +24,21 @@ void data_section_init()
 void uart_task(void *pvParameters);
 
 static task_desc_t tasks[] = {
-    {
-        hello_task1,
-        "hello_task1",
-        configMAX_PRIORITIES - 1,
-        128,
-    },
-
-    {
-        hello_task2,
-        "hello_task2",
-        configMAX_PRIORITIES - 1,
-        128,
-    }, 
-
+    {hello_task1, "hello_task1", configMAX_PRIORITIES - 1, 128, NULL},
+    {hello_task2, "hello_task2", configMAX_PRIORITIES - 1, 128, NULL},
     {
         epit1_task,
         "epit1_task",
         configMAX_PRIORITIES - 1,
         128,
     },
-
-    {
-        NULL,
-        NULL,
-        0,
-        0,
-    }
+#if 0
+    { print_task, "print_task", configMAX_PRIORITIES - 1, 128, NULL},
+    { scanf_task, "scanf_task", configMAX_PRIORITIES - 1, 128, &
+    scanfTaskHandle},
+#endif
+    
+    {NULL, NULL, 0, 0, NULL,}
 };
 
 int main(void)
@@ -79,7 +57,6 @@ int main(void)
     DbgConsole_Init(UART1_BASE, 115200, DEBUG_CONSOLE_DEVICE_TYPE_IUART, QEMU_CLK);
 
     PRINTF("hello 6ul freertos\n");
-
 
     while (tasks[i].entry != NULL) {
         if (xTaskCreate(tasks[i].entry, 

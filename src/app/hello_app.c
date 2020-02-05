@@ -1,18 +1,19 @@
-#include <stdarg.h>
-#include <stdint.h>
-#include <FreeRTOS.h>
-#include <stdbool.h>
-#include <semphr.h>
-#include <fsl_common.h>
-#include <task.h>
-#include <fsl_debug_console.h>
+#include <app.h>
+
+static void delay()
+{
+    uint32_t i,j = 0;
+    for (i = 0; i < 1000; i++) 
+        for (j = 0; j < 65536; j++);
+}
 
 void hello_task2(void *pvParameters) 
 {
     uint32_t i = 0;
     for (;;) {
         PRINTF("%s:%d\n", __func__, i++);
-        vTaskDelay(1000);
+        // vTaskDelay(1000);
+        delay();
     }
 }
 
@@ -21,6 +22,7 @@ void hello_task1(void *pvParameters)
     uint32_t i = 0;
     for (;;) {
         PRINTF("%s:%d\n", __func__, i++);
-        vTaskDelay(1000);
+        // vTaskDelay(1000);
+        delay();
     }
 }
