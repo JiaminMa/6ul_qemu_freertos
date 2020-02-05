@@ -35,3 +35,16 @@ uint32_t strlen(char *s)
 
     return len;
 }
+
+double modf(double x, double *iptr)
+{
+   return x;
+}
+
+double pow(double num, int n)
+{
+    double powint = 1;
+    int i;
+    for(i = 1; i <= n; i++) powint*=num;
+    return powint;
+}

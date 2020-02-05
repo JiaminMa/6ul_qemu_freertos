@@ -1,8 +1,12 @@
-#include <print.h>
+#include <stdarg.h>
+#include <stdint.h>
+#include <FreeRTOS.h>
+#include <stdbool.h>
+#include <semphr.h>
 #include <system.h>
 #include <core_ca7.h>
-#include <board.h>
 #include <task.h>
+#include <fsl_debug_console.h>
 
 static bool s_is_epit_flag;
 static uint32_t s_epit1_counter;
@@ -41,12 +45,12 @@ void epit1_task(void *pvParamters)
 {
     
     epit1_init(0, 66000000/2);
-    trace("%s is_epit_flag:%d\n", __func__, s_is_epit_flag);
+    PRINTF("%s is_epit_flag:%d\n", __func__, s_is_epit_flag);
     while(1) {
         while(s_is_epit_flag == false) {
             taskYIELD();
         }
-        trace("%s: %d\n", __func__, s_epit1_counter);
+        PRINTF("%s: %d\n", __func__, s_epit1_counter);
         s_is_epit_flag = false;
     }
 }

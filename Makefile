@@ -36,19 +36,19 @@ VPATH			:= $(SRCDIRS)
 .PHONY:clean
 
 $(TARGET).bin : $(OBJS)
-	$(LD) -Tsrc/6ul_freertos.ld  -o $(TARGET).elf $^
+	$(LD) -Tsrc/6ul_freertos.ld -o $(TARGET).elf $^
 	$(OBJCOPY) -O binary -S $(TARGET).elf $@
 	$(OBJDUMP) -D -S -m arm $(TARGET).elf > $(TARGET).dis
 	$(OBJDUMP) -D -m arm $(TARGET).elf > $(TARGET).lst
 
 $(SOBJS) : obj/%.o : %.S
-	$(CC) -Wall -nostdlib -c -g -O0 -mno-unaligned-access -Wall -mfloat-abi=hard -mfpu=vfpv4 -MMD -MP -fno-common -ffunction-sections -fdata-sections -ffreestanding -fno-builtin -mapcs -std=gnu99 -mcpu=cortex-a7 $(INCLUDE) -o $@ $<
+	$(CC) -Wall -nostdlib -c -g -O0 -mno-unaligned-access -Wall -mfloat-abi=hard -mfpu=vfpv4 -MMD -MP -fno-common -ffunction-sections -fdata-sections -ffreestanding -fno-builtin -mapcs -std=gnu99 -mcpu=cortex-a7  -DDEBUG -DCPU_MCIMX6Y2DVM05 -DFSL_RTOS_FREE_RTOS -DEVK_MCIMX6ULL $(INCLUDE) -o $@ $<
 
 $(COBJS) : obj/%.o : %.c
 
 
 	#$(CC) -Wall -nostdlib -c -O0 -g -mcpu=cortex-a7 $(INCLUDE) -o $@ $<
-	$(CC) -Wall -nostdlib -c -g -O0 -mno-unaligned-access -Wall -mfloat-abi=hard -mfpu=vfpv4 -MMD -MP -fno-common -ffunction-sections -fdata-sections -ffreestanding -fno-builtin -mapcs -std=gnu99 -mcpu=cortex-a7  $(INCLUDE) -o $@ $<
+	$(CC) -Wall -nostdlib -c -g -O0 -mno-unaligned-access -Wall -mfloat-abi=hard -mfpu=vfpv4 -MMD -MP -fno-common -ffunction-sections -fdata-sections -ffreestanding -fno-builtin -mapcs -std=gnu99 -mcpu=cortex-a7 -DDEBUG -DCPU_MCIMX6Y2DVM05 -DFSL_RTOS_FREE_RTOS -DEVK_MCIMX6ULL $(INCLUDE) -o $@ $<
 
 qemu: $(OBJS)
 	qemu-system-arm -M mcimx6ul-evk -show-cursor -m 512M \

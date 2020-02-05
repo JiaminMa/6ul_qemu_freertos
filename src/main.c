@@ -1,14 +1,15 @@
 #include <FreeRTOS.h>
-#include "task.h"
-#include "queue.h"
-#include "timers.h"
-#include "fsl_device_registers.h"
-#include "fsl_common.h"
+#include <task.h>
+#include <queue.h>
+#include <timers.h>
+#include <fsl_device_registers.h>
+#include <fsl_common.h>
 #include <stdarg.h>
 #include <stdint.h>
-#include <print.h>
+#include <fsl_debug_console.h>
 #include <app.h>
 #include <core_ca7.h>
+
 
 typedef struct task_desc_tag {
     void (*entry)(void *);
@@ -29,6 +30,8 @@ void data_section_init()
     uint32_t len = *(uint32_t *)0x48 - *(uint32_t *)0x44;
     memcpy((void *)dst, (void *)src, len);
 }
+
+void uart_task(void *pvParameters);
 
 static task_desc_t tasks[] = {
     {
@@ -53,13 +56,6 @@ static task_desc_t tasks[] = {
     },
 
     {
-        uart1_task,
-        "uart1_task",
-        configMAX_PRIORITIES - 1,
-        128,
-    },
-
-    {
         NULL,
         NULL,
         0,
@@ -74,16 +70,16 @@ int main(void)
     /* don't touch any global variable before here */
     data_section_init();
 
+    /* init the system interrupt */
      GIC_Init();
     __set_VBAR((uint32_t)0);
     SystemInitIrqTable();
+    
+    GIC_SetPriority(UART1_IRQn, 25);
+    DbgConsole_Init(UART1_BASE, 115200, DEBUG_CONSOLE_DEVICE_TYPE_IUART, QEMU_CLK);
 
-    if (true == print_init()) {
-        trace("%s print init success\n ", __func__);
-    } else {
-        trace("%s failure system hangs...\n", __func__);
-        while(1);
-    }
+    PRINTF("hello 6ul freertos\n");
+
 
     while (tasks[i].entry != NULL) {
         if (xTaskCreate(tasks[i].entry, 
@@ -92,10 +88,10 @@ int main(void)
                         NULL, 
                         tasks[i].prio, 
                         NULL) != pdPASS) {
-            trace("%s creation failed!.\n", tasks[i].name);
+            PRINTF("%s creation failed!.\n", tasks[i].name);
             while (1);
         } else {
-             trace("%s creation success!.\n", tasks[i].name);
+            PRINTF("%s creation success!.\n", tasks[i].name);
         }
         i++;
     }
