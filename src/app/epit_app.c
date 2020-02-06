@@ -37,12 +37,12 @@ void epit1_task(void *pvParamters)
 {
     
     epit1_init(0, 66000000/2);
-    PRINTF("%s is_epit_flag:%d\n", __func__, s_is_epit_flag);
+    trace("%s is_epit_flag:%d\n", __func__, s_is_epit_flag);
     while(1) {
         while(s_is_epit_flag == false) {
             taskYIELD();
         }
-        PRINTF("%s: %d\n", __func__, s_epit1_counter);
+        trace("%s: %d\n", __func__, s_epit1_counter);
         s_is_epit_flag = false;
     }
 }

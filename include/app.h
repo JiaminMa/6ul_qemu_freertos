@@ -9,7 +9,7 @@
 #include <system.h>
 #include <core_ca7.h>
 #include <task.h>
-#include <fsl_debug_console.h>
+#include <print.h>
 
 #define QEMU_CLK    1
 #define ECHO_BUF_SIZE 32

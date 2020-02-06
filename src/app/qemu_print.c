@@ -1,58 +1,9 @@
 #include <print.h>
 #include <fsl_uart.h>
 #include <app.h>
+#include <tiny_console.h>
 
 static SemaphoreHandle_t sPrintMutex;
-extern uint8_t g_echo_buf[];
-extern uint32_t g_echo_buf_widx;
-extern uint32_t g_echo_buf_ridx;
-extern bool is_clear_show;
-extern bool is_cr;
-
-void UART1_IRQHandler(void)
-{
-    uint8_t data;
-
-    /* If new data arrived. */
-    if ((UART_GetStatusFlag(UART1, kUART_RxDataReadyFlag)) 
-        || (UART_GetStatusFlag(UART1, kUART_RxOverrunFlag))) {
-
-        data = UART_ReadByte(UART1);
-        /* If ring buffer is not full, add data to ring buffer. */
-        if (((g_echo_buf_widx + 1) % ECHO_BUF_SIZE) != g_echo_buf_widx) {
-            if (data == 0x7f) {
-                g_echo_buf[g_echo_buf_widx] = 0;
-                if (g_echo_buf_ridx > 0)
-                    g_echo_buf_ridx--;
-                if (g_echo_buf_widx > 0)
-                    g_echo_buf_widx--;
-                is_clear_show = true;
-            } else if (data == 0xd) {
-                is_cr = true;
-            }else {
-                g_echo_buf[g_echo_buf_widx] = data;
-                g_echo_buf_widx++;
-                g_echo_buf_widx %= ECHO_BUF_SIZE;
-            }
-        }
-    }
-}
-
-static void uart1_init()
-{
-    uart_config_t config;
-
-    UART_GetDefaultConfig(&config);
-    config.baudRate_Bps = 115200;
-    config.enableTx = true;
-    config.enableRx = true;
-    UART_Init(UART1, &config, QEMU_CLK);
-    
-    SystemInstallIrqHandler(UART1_IRQn, (system_irq_handler_t)UART1_IRQHandler, NULL);
-    UART_EnableInterrupts(UART1, kUART_RxDataReadyEnable | kUART_RxOverrunEnable);
-    EnableIRQ(UART1_IRQn);
-   
-}
 
 char uart_putc(unsigned char ch)
 {
@@ -64,7 +15,7 @@ bool print_init()
 {
     bool ret = true;
 
-    uart1_init();
+    tiny_console_init();
 
     sPrintMutex = xSemaphoreCreateMutex();
     if (sPrintMutex == NULL) {
