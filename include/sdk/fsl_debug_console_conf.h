@@ -31,6 +31,7 @@
 #define _FSL_DEBUG_CONSOLE_CONF_H_
 
 #define SDK_DEBUGCONSOLE 1U
+// #define DEBUG_CONSOLE_TRANSFER_POLLING 1UL
 /*****************Select Debug console device***************************/
 /*! @brief Debug console device select.
 * Device must be selected per the platform's capability.

@@ -1,4 +1,5 @@
 #include <app.h>
+#include <print.h>
 
 typedef struct task_desc_tag {
     void (*entry)(void *);
@@ -24,6 +25,8 @@ void data_section_init()
 void uart_task(void *pvParameters);
 
 static task_desc_t tasks[] = {
+
+#if 0
     {hello_task1, "hello_task1", configMAX_PRIORITIES - 1, 128, NULL},
     {hello_task2, "hello_task2", configMAX_PRIORITIES - 1, 128, NULL},
     {
@@ -32,13 +35,15 @@ static task_desc_t tasks[] = {
         configMAX_PRIORITIES - 1,
         128,
     },
-#if 0
-    { print_task, "print_task", configMAX_PRIORITIES - 1, 128, NULL},
-    { scanf_task, "scanf_task", configMAX_PRIORITIES - 1, 128, &
-    scanfTaskHandle},
-#endif
     
-    {NULL, NULL, 0, 0, NULL,}
+    { control_task, "control_task", configMAX_PRIORITIES - 1, 
+        128, &g_control_task_handle},
+#endif  
+    { print_task, "print_task", configMAX_PRIORITIES - 1,
+        128, &g_print_task_handle},
+    {console_task, "console_task", configMAX_PRIORITIES - 1,
+        128, &g_console_task_handle},
+    {NULL, NULL, 0, 0, NULL, NULL}
 };
 
 int main(void)
@@ -54,9 +59,11 @@ int main(void)
     SystemInitIrqTable();
     
     GIC_SetPriority(UART1_IRQn, 25);
-    DbgConsole_Init(UART1_BASE, 115200, DEBUG_CONSOLE_DEVICE_TYPE_IUART, QEMU_CLK);
+    print_init();
+    trace("hello world\n");
+    // DbgConsole_Init(UART1_BASE, 115200, DEBUG_CONSOLE_DEVICE_TYPE_IUART, QEMU_CLK);
 
-    PRINTF("hello 6ul freertos\n");
+    trace("hello 6ul freertos\n");
 
     while (tasks[i].entry != NULL) {
         if (xTaskCreate(tasks[i].entry, 
@@ -64,11 +71,11 @@ int main(void)
                         tasks[i].stack_size,  
                         NULL, 
                         tasks[i].prio, 
-                        NULL) != pdPASS) {
-            PRINTF("%s creation failed!.\n", tasks[i].name);
+                        tasks[i].task_handle_p) != pdPASS) {
+            trace("%s creation failed!.\n", tasks[i].name);
             while (1);
         } else {
-            PRINTF("%s creation success!.\n", tasks[i].name);
+            trace("%s creation success!.\n", tasks[i].name);
         }
         i++;
     }
