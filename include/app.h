@@ -26,10 +26,8 @@ extern void hello_task1(void *);
 
 /* Demo debug console */
 extern void print_task(void *);
-extern void control_task(void *);
 extern void console_task(void *);
 extern TaskHandle_t g_print_task_handle;
-extern TaskHandle_t g_control_task_handle;
 extern TaskHandle_t g_console_task_handle;
 
 #endif

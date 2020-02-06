@@ -26,3 +26,13 @@ void hello_task1(void *pvParameters)
         delay();
     }
 }
+
+TaskHandle_t g_print_task_handle = NULL;
+
+void print_task(void *pvParameters)
+{
+    while (1) {
+        vTaskSuspend(g_print_task_handle);
+        trace("\nprint stask resumed\n");
+    }
+}

@@ -1,5 +1,6 @@
 #include <stdint.h>
 #include <stdio.h>
+#include <stdbool.h>
 
 void __assert_fail(unsigned int i)
 {
@@ -47,4 +48,13 @@ double pow(double num, int n)
     int i;
     for(i = 1; i <= n; i++) powint*=num;
     return powint;
+}
+
+bool strcmp(char *str1, char *str2)
+{
+    while(*str1 && (*str1==*str2)){
+        ++str1;
+        ++str2;
+    }
+    return (*str1 - *str2 == 0) ? true : false;
 }

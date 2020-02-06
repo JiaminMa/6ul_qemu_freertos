@@ -41,9 +41,7 @@ static task_desc_t tasks[] = {
 #endif  
     { print_task, "print_task", configMAX_PRIORITIES - 1,
         128, &g_print_task_handle},
-    {console_task, "console_task", configMAX_PRIORITIES - 1,
-        128, &g_console_task_handle},
-    {NULL, NULL, 0, 0, NULL, NULL}
+    {NULL, NULL, 0, 0, NULL}
 };
 
 int main(void)
@@ -58,11 +56,9 @@ int main(void)
     __set_VBAR((uint32_t)0);
     SystemInitIrqTable();
     
-    GIC_SetPriority(UART1_IRQn, 25);
+    
     print_init();
     trace("hello world\n");
-    // DbgConsole_Init(UART1_BASE, 115200, DEBUG_CONSOLE_DEVICE_TYPE_IUART, QEMU_CLK);
-
     trace("hello 6ul freertos\n");
 
     while (tasks[i].entry != NULL) {
