@@ -124,7 +124,7 @@
 /* Run time and task stats gathering related definitions. */
 #define configGENERATE_RUN_TIME_STATS           0
 #define configUSE_TRACE_FACILITY                1
-#define configUSE_STATS_FORMATTING_FUNCTIONS    0
+#define configUSE_STATS_FORMATTING_FUNCTIONS    1
 
 /* Task aware debugging. */
 #define configRECORD_STACK_HIGH_ADDRESS         1
@@ -196,4 +196,5 @@
 #define configINTERRUPT_CONTROLLER_CPU_INTERFACE_OFFSET 0x1000UL
 #define configUNIQUE_INTERRUPT_PRIORITIES 32
 
+#define sprintf tfp_sprintf
 #endif /* FREERTOS_CONFIG_H */

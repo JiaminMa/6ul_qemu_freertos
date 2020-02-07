@@ -14,6 +14,7 @@ INCUDIRS		:= 	include \
 SRCDIRS			:= 	src \
 					src/driver \
 					src/app	\
+					src/app/cmd \
 					src/freertos/Source
 
 INCLUDE 		:= 	$(patsubst %, -I %, $(INCUDIRS))

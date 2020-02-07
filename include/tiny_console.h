@@ -18,5 +18,4 @@ typedef struct tiny_console_tag{
 
 extern void tiny_console_init(void);
 
-
 #endif

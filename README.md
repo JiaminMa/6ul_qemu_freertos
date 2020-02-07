@@ -28,3 +28,17 @@ hello_task2:7
 
 make debug all
 cgdb -d arm-linux-gdb 6ul_freertos.elf
+
+# A tiny console to debug
+
+## trace task info
+
+```c
+tiny_console:$taskinfo
+===================================================
+Task Name               Stat    Prio    RStack  TID
+tiny_console_task       R       3       955     1
+IDLE                    R       0       60      3
+print_task              S       4       92      2
+Tmr Svc                 S       4       138     4
+```

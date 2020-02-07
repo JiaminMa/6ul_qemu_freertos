@@ -1,6 +1,7 @@
 #include <app.h>
 #include <fsl_uart.h>
 #include <tiny_console.h>
+#include <cmd.h>
 
 static tiny_console_t g_console; 
 
@@ -15,10 +16,22 @@ static void uart1_irq_handler(void)
     }
 }
 
+char buf[256];
 static void tiny_console_handle_cmd(char *cmd)
 {
-    if (strcmp(cmd, "ls") == true) {
-        vTaskResume(g_print_task_handle);
+    if (true == strcmp(cmd, "ls")) {
+        vTaskResume(g_print_task_handle); 
+    } else if (true == strcmp(cmd, "taskinfo")) {
+        trace("\n===================================================");
+        trace("\nTask Name\t\tStat\tPrio\tRStack\tTID\n");
+        vTaskList(buf);
+        trace("%s", buf);
+    } else if (true == strcmp(cmd, "clear")) {
+         /* do nothing */
+    } else if (true == strcmp(cmd, "")) {
+        /* do nothing */
+    } else if (true == strcmp(cmd, "hello")) {
+        do_hello();
     } else {
         trace("\ninvalid command");
     }
@@ -126,7 +139,7 @@ void tiny_console_init()
     }
 
     if (xTaskCreate(tiny_console_task, "tiny_console_task", 
-        128, NULL, configMAX_PRIORITIES - 2, g_console.console_task_handle) 
+        1024, NULL, configMAX_PRIORITIES - 2, g_console.console_task_handle) 
                 != pdPASS) {
         while(1);
     }

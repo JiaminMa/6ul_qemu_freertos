@@ -58,7 +58,6 @@ int main(void)
     
     
     print_init();
-    trace("hello world\n");
     trace("hello 6ul freertos\n");
 
     while (tasks[i].entry != NULL) {
