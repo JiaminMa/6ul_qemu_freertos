@@ -26,6 +26,11 @@ static void tiny_console_handle_cmd(char *cmd)
         trace("\nTask Name\t\tStat\tPrio\tRStack\tTID\n");
         vTaskList(buf);
         trace("%s", buf);
+    } else if (true == strcmp(cmd, "top")) {
+        trace("\n===================================================");
+        trace("\nTask Name\t\tRuntime\t\tCPU Rate\n");
+        vTaskGetRunTimeStats(buf);
+        trace("%s", buf);
     } else if (true == strcmp(cmd, "clear")) {
          /* do nothing */
     } else if (true == strcmp(cmd, "")) {
@@ -138,7 +143,7 @@ void tiny_console_init()
         while(1);
     }
 
-    if (xTaskCreate(tiny_console_task, "tiny_console_task", 
+    if (xTaskCreate(tiny_console_task, "init_console", 
         1024, NULL, configMAX_PRIORITIES - 2, g_console.console_task_handle) 
                 != pdPASS) {
         while(1);

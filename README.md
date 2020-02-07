@@ -42,3 +42,13 @@ IDLE                    R       0       60      3
 print_task              S       4       92      2
 Tmr Svc                 S       4       138     4
 ```
+
+```c
+tiny_console:$top
+===================================================
+Task Name               Runtime         CPU Rate
+init_console            738             <1%
+IDLE                    77944           99%
+print_task              5               <1%
+Tmr Svc                 20              <1%
+```

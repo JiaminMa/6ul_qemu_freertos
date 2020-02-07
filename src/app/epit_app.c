@@ -2,12 +2,14 @@
 
 static bool s_is_epit_flag;
 static uint32_t s_epit1_counter;
+volatile uint32_t g_cpu_runtime;
 
 static void epit1_irqhandler(uint32_t gicciar, void *param)
 {
     if(EPIT1->SR & (1 << 0)) {
         s_is_epit_flag = true;
         s_epit1_counter++;
+        g_cpu_runtime++;
     }
     EPIT1->SR |= (1 << 0);
 }
@@ -45,4 +47,10 @@ void epit1_task(void *pvParamters)
         trace("%s: %d\n", __func__, s_epit1_counter);
         s_is_epit_flag = false;
     }
+}
+
+void setup_trace()
+{
+    g_cpu_runtime = 0;
+    epit1_init(0, 6600);
 }

@@ -122,7 +122,7 @@
 #define configUSE_DAEMON_TASK_STARTUP_HOOK      0
 
 /* Run time and task stats gathering related definitions. */
-#define configGENERATE_RUN_TIME_STATS           0
+#define configGENERATE_RUN_TIME_STATS           1
 #define configUSE_TRACE_FACILITY                1
 #define configUSE_STATS_FORMATTING_FUNCTIONS    1
 
@@ -197,4 +197,10 @@
 #define configUNIQUE_INTERRUPT_PRIORITIES 32
 
 #define sprintf tfp_sprintf
+
+extern volatile unsigned int g_cpu_runtime;
+
+#define portCONFIGURE_TIMER_FOR_RUN_TIME_STATS() (g_cpu_runtime = 0ul)
+#define portGET_RUN_TIME_COUNTER_VALUE() g_cpu_runtime
+
 #endif /* FREERTOS_CONFIG_H */

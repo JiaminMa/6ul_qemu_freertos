@@ -1,6 +1,8 @@
 #include <app.h>
 #include <print.h>
 
+extern void setup_trace(void);
+
 typedef struct task_desc_tag {
     void (*entry)(void *);
     char *name;
@@ -56,9 +58,10 @@ int main(void)
     __set_VBAR((uint32_t)0);
     SystemInitIrqTable();
     
-    
     print_init();
     trace("hello 6ul freertos\n");
+
+    setup_trace();
 
     while (tasks[i].entry != NULL) {
         if (xTaskCreate(tasks[i].entry, 
