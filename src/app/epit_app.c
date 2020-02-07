@@ -2,7 +2,10 @@
 
 static bool s_is_epit_flag;
 static uint32_t s_epit1_counter;
-volatile uint32_t g_cpu_runtime;
+
+#if (configGENERATE_RUN_TIME_STATS == 1)
+    volatile uint32_t g_cpu_runtime;
+#endif
 
 static void epit1_irqhandler(uint32_t gicciar, void *param)
 {
@@ -51,6 +54,8 @@ void epit1_task(void *pvParamters)
 
 void setup_trace()
 {
+#if (configGENERATE_RUN_TIME_STATS == 1)
     g_cpu_runtime = 0;
     epit1_init(0, 6600);
+#endif
 }

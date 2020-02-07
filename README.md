@@ -5,28 +5,21 @@ logs is as follow:
 ```c
 qemu-system-arm -M mcimx6ul-evk -show-cursor -m 512M \
                 -kernel 6ul_freertos.elf -nographic -serial mon:stdio
-main print init success
- hello_task:0
-hello_task2:0
-hello_task:1
-hello_task2:1
-hello_task:2
-hello_task2:2
-hello_task:3
-hello_task2:3
-hello_task:4
-hello_task2:4
-hello_task:5
-hello_task2:5
-hello_task:6
-hello_task2:6
-hello_task:7
-hello_task2:7
+hello 6ul freertos
+print_task creation success!.
+tiny_console_task entry
+tiny_console:$clear             
+tiny_console:$hellp
+invalid command
+tiny_console:$hello             
+hello cmd
+tiny_console:$
 ```
 
 # How to debug
 
 make debug all
+
 cgdb -d arm-linux-gdb 6ul_freertos.elf
 
 # A tiny console to debug
