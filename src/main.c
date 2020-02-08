@@ -1,5 +1,6 @@
 #include <app.h>
 #include <print.h>
+#include <ff.h>
 
 extern void setup_trace(void);
 
@@ -11,20 +12,6 @@ typedef struct task_desc_tag {
     TaskHandle_t *task_handle_p;
 } task_desc_t;
 
-void vApplicationIRQHandler(uint32_t ulICCIAR)
-{
-    SystemIrqHandler(ulICCIAR);
-}
-
-void data_section_init()
-{
-    uint32_t src = *(uint32_t *)0x40;
-    uint32_t dst = *(uint32_t *)0x44;
-    uint32_t len = *(uint32_t *)0x48 - *(uint32_t *)0x44;
-    memcpy((void *)dst, (void *)src, len);
-}
-
-void uart_task(void *pvParameters);
 
 static task_desc_t tasks[] = {
 
@@ -40,11 +27,25 @@ static task_desc_t tasks[] = {
     
     { control_task, "control_task", configMAX_PRIORITIES - 1, 
         128, &g_control_task_handle},
-#endif  
+#endif 
+    { init_task, "initd", configMAX_PRIORITIES, 128, &g_init_task_handle},
     { print_task, "print_task", configMAX_PRIORITIES - 1,
         128, &g_print_task_handle},
     {NULL, NULL, 0, 0, NULL}
 };
+
+void vApplicationIRQHandler(uint32_t ulICCIAR)
+{
+    SystemIrqHandler(ulICCIAR);
+}
+
+void data_section_init()
+{
+    uint32_t src = *(uint32_t *)0x40;
+    uint32_t dst = *(uint32_t *)0x44;
+    uint32_t len = *(uint32_t *)0x48 - *(uint32_t *)0x44;
+    memcpy((void *)dst, (void *)src, len);
+}
 
 int main(void)
 {
@@ -60,7 +61,6 @@ int main(void)
     
     print_init();
     trace("hello 6ul freertos\n");
-
     setup_trace();
 
     while (tasks[i].entry != NULL) {

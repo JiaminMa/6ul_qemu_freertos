@@ -8,14 +8,16 @@ OBJDUMP			:= $(CROSS_COMPILE)objdump
 
 INCUDIRS		:= 	include \
 					include/sdk \
-					src/freertos/Source/include
+					src/freertos/Source/include \
+					src/fatfs
 
 
 SRCDIRS			:= 	src \
 					src/driver \
 					src/app	\
 					src/app/cmd \
-					src/freertos/Source
+					src/freertos/Source \
+					src/fatfs
 
 INCLUDE 		:= 	$(patsubst %, -I %, $(INCUDIRS))
 
@@ -53,12 +55,14 @@ $(COBJS) : obj/%.o : %.c
 
 qemu: $(OBJS)
 	qemu-system-arm -M mcimx6ul-evk -show-cursor -m 512M \
-			-kernel 6ul_freertos.elf -nographic -serial mon:stdio
+			-kernel 6ul_freertos.elf -nographic -serial mon:stdio \
+			 -sd ../testfs.img
 	 
 
 debug: $(OBJS)
 	qemu-system-arm -M mcimx6ul-evk -show-cursor -m 512M \
-			-kernel 6ul_freertos.elf -nographic -serial mon:stdio -s -S
+			-kernel 6ul_freertos.elf -nographic -serial mon:stdio -s -S \
+			-sd ../testfs.img
 
 clean:
 	rm -rf $(TARGET).elf $(TARGET).bin $(TARGET).dis $(OBJS) *.lst

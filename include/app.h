@@ -30,4 +30,8 @@ extern void console_task(void *);
 extern TaskHandle_t g_print_task_handle;
 extern TaskHandle_t g_console_task_handle;
 
+/* Init task */
+extern void init_task(void *);
+extern TaskHandle_t g_init_task_handle;
+
 #endif

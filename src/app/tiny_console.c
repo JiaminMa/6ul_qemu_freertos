@@ -3,7 +3,7 @@
 #include <tiny_console.h>
 #include <cmd.h>
 
-static tiny_console_t g_console; 
+static tiny_console_t g_console;
 
 static void uart1_irq_handler(void)
 {
@@ -37,6 +37,7 @@ static void tiny_console_handle_cmd(char *cmd)
         /* do nothing */
     } else if (true == strcmp(cmd, "hello")) {
         do_hello();
+    } else if (true == strcmp(cmd, "cat")) {
     } else {
         trace("\ninvalid command");
     }
