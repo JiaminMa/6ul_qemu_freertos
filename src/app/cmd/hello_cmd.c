@@ -5,7 +5,7 @@ static TaskHandle_t s_hello_main_handle;
 
 static void hello_main()
 {
-    trace("\nhello cmd");
+    trace("hello cmd\n");
     vTaskDelete(s_hello_main_handle);
     while(1);
 }

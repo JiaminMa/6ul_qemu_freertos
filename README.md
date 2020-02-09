@@ -24,24 +24,4 @@ cgdb -d arm-linux-gdb 6ul_freertos.elf
 
 # A tiny console to debug
 
-## trace task info
-
-```c
-tiny_console:$taskinfo
-===================================================
-Task Name               Stat    Prio    RStack  TID
-tiny_console_task       R       3       955     1
-IDLE                    R       0       60      3
-print_task              S       4       92      2
-Tmr Svc                 S       4       138     4
-```
-
-```c
-tiny_console:$top
-===================================================
-Task Name               Runtime         CPU Rate
-init_console            738             <1%
-IDLE                    77944           99%
-print_task              5               <1%
-Tmr Svc                 20              <1%
-```
+![](https://s2.ax1x.com/2020/02/09/1fxiVO.gif)

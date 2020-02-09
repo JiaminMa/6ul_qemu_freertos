@@ -2,6 +2,7 @@
 #include <fsl_uart.h>
 #include <tiny_console.h>
 #include <cmd.h>
+#include <ff.h>
 
 static tiny_console_t g_console;
 
@@ -19,27 +20,41 @@ static void uart1_irq_handler(void)
 char buf[256];
 static void tiny_console_handle_cmd(char *cmd)
 {
-    if (true == strcmp(cmd, "ls")) {
-        vTaskResume(g_print_task_handle); 
-    } else if (true == strcmp(cmd, "taskinfo")) {
-        trace("\n===================================================");
+    char *argvs[10];
+    uint32_t argc = 0;
+    argvs[argc++] = strtok(cmd, " ");
+    while (argvs[argc - 1] != NULL) {
+        argvs[argc++] = strtok(NULL , " ");
+    }
+
+    trace("\n");
+    if (true == strcmp(argvs[0], "ls")) {
+        // vTaskResume(g_print_task_handle); 
+        do_ls(argvs, argc);
+    } else if (true == strcmp(argvs[0], "taskinfo")) {
+        trace("===================================================");
         trace("\nTask Name\t\tStat\tPrio\tRStack\tTID\n");
         vTaskList(buf);
         trace("%s", buf);
-    } else if (true == strcmp(cmd, "top")) {
-        trace("\n===================================================");
+    } else if (true == strcmp(argvs[0], "top")) {
+        trace("===================================================");
         trace("\nTask Name\t\tRuntime\t\tCPU Rate\n");
         vTaskGetRunTimeStats(buf);
         trace("%s", buf);
-    } else if (true == strcmp(cmd, "clear")) {
+    } else if (true == strcmp(argvs[0], "clear")) {
          /* do nothing */
-    } else if (true == strcmp(cmd, "")) {
+    } else if (true == strcmp(argvs[0], "")) {
         /* do nothing */
-    } else if (true == strcmp(cmd, "hello")) {
+    } else if (true == strcmp(argvs[0], "hello")) {
         do_hello();
-    } else if (true == strcmp(cmd, "cat")) {
+    } else if (true == strcmp(argvs[0], "cat")) {
+        do_cat(argvs, argc);
+    } else if (true == strcmp(argvs[0], "mkdir")) {
+        if (f_mkdir(argvs[1]) != FR_OK)  {
+            trace("create folder failure\n");
+        }
     } else {
-        trace("\ninvalid command");
+        trace("invalid command\n");
     }
 }
 
@@ -121,7 +136,7 @@ static void tiny_console_task(void *pvParameters)
             g_console.wr_idx = 0;
             g_console.rd_idx = 0;
             g_console.is_carriage = false;
-            trace("\n"TINY_CONSEL_PROMOPT);
+            trace(TINY_CONSEL_PROMOPT);
         }
     }
 }
