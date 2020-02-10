@@ -25,3 +25,6 @@ cgdb -d arm-linux-gdb 6ul_freertos.elf
 # A tiny console to debug
 
 ![tiny console preview](https://s2.ax1x.com/2020/02/09/1fxiVO.gif)
+
+# LCD Demo
+![LCD demo](https://s2.ax1x.com/2020/02/10/15mCeU.gif)

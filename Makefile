@@ -54,15 +54,15 @@ $(COBJS) : obj/%.o : %.c
 	$(CC) -Wall -nostdlib -c -g -O0 -mno-unaligned-access -Wall -mfloat-abi=hard -mfpu=vfpv4 -MMD -MP -fno-common -ffunction-sections -fdata-sections -ffreestanding -fno-builtin -mapcs -std=gnu99 -mcpu=cortex-a7 -DDEBUG -DCPU_MCIMX6Y2DVM05 -DFSL_RTOS_FREE_RTOS -DEVK_MCIMX6ULL $(INCLUDE) -o $@ $<
 
 qemu: $(OBJS)
-	qemu-system-arm -M mcimx6ul-evk -show-cursor -m 512M \
-			-kernel 6ul_freertos.elf -serial mon:stdio \
-			 -sd ../testfs.img
+	./qemu/bin/qemu-system-arm -M mcimx6ul-evk   -show-cursor  -m 512M -kernel 6ul_freertos.elf \
+    -display sdl -serial mon:stdio \
+    -nic user -com 100ask -sd ../testfs.img
 	 
 
 debug: $(OBJS)
-	qemu-system-arm -M mcimx6ul-evk -show-cursor -m 512M \
-			-kernel 6ul_freertos.elf -serial mon:stdio -s -S \
-			-sd ../testfs.img
+	./qemu/bin/qemu-system-arm -M mcimx6ul-evk   -show-cursor  -m 512M -kernel 6ul_freertos.elf \
+    -display sdl -serial mon:stdio \
+    -nic user -com 100ask -sd ../testfs.img -s -S
 
 clean:
 	rm -rf $(TARGET).elf $(TARGET).bin $(TARGET).dis $(OBJS) *.lst
