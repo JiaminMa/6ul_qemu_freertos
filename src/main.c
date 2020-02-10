@@ -28,9 +28,12 @@ static task_desc_t tasks[] = {
     { control_task, "control_task", configMAX_PRIORITIES - 1, 
         128, &g_control_task_handle},
 #endif 
-    { init_task, "initd", configMAX_PRIORITIES, 128, &g_init_task_handle},
+    { init_task, "initd", configMAX_PRIORITIES, 
+        128, &g_init_task_handle},
     { print_task, "print_task", configMAX_PRIORITIES - 1,
         128, &g_print_task_handle},
+    { display_task, "displayd", configMAX_PRIORITIES - 1, 
+        1024 * 32, &g_display_task_handle},
     {NULL, NULL, 0, 0, NULL}
 };
 

@@ -55,13 +55,13 @@ $(COBJS) : obj/%.o : %.c
 
 qemu: $(OBJS)
 	qemu-system-arm -M mcimx6ul-evk -show-cursor -m 512M \
-			-kernel 6ul_freertos.elf -nographic -serial mon:stdio \
+			-kernel 6ul_freertos.elf -serial mon:stdio \
 			 -sd ../testfs.img
 	 
 
 debug: $(OBJS)
 	qemu-system-arm -M mcimx6ul-evk -show-cursor -m 512M \
-			-kernel 6ul_freertos.elf -nographic -serial mon:stdio -s -S \
+			-kernel 6ul_freertos.elf -serial mon:stdio -s -S \
 			-sd ../testfs.img
 
 clean:

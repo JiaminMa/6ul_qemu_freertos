@@ -160,7 +160,7 @@ void tiny_console_init()
     }
 
     if (xTaskCreate(tiny_console_task, "init_console", 
-        1024, NULL, configMAX_PRIORITIES - 2, g_console.console_task_handle) 
+        1024, NULL, configMAX_PRIORITIES, g_console.console_task_handle) 
                 != pdPASS) {
         while(1);
     }

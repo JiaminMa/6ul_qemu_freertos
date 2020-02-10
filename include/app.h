@@ -34,4 +34,9 @@ extern TaskHandle_t g_console_task_handle;
 extern void init_task(void *);
 extern TaskHandle_t g_init_task_handle;
 
+/* Display task */
+extern void display_task(void *);
+extern TaskHandle_t g_display_task_handle;
+
+
 #endif
