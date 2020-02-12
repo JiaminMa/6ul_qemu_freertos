@@ -44,9 +44,9 @@ void vApplicationIRQHandler(uint32_t ulICCIAR)
 
 void data_section_init()
 {
-    uint32_t src = *(uint32_t *)0x40;
-    uint32_t dst = *(uint32_t *)0x44;
-    uint32_t len = *(uint32_t *)0x48 - *(uint32_t *)0x44;
+    uint32_t src = *(uint32_t *)0x80000040;
+    uint32_t dst = *(uint32_t *)0x80000044;
+    uint32_t len = *(uint32_t *)0x80000048 - *(uint32_t *)0x80000044;
     memcpy((void *)dst, (void *)src, len);
 }
 
@@ -59,7 +59,7 @@ int main(void)
 
     /* init the system interrupt */
      GIC_Init();
-    __set_VBAR((uint32_t)0);
+    __set_VBAR((uint32_t)0x80000000);
     SystemInitIrqTable();
     
     print_init();
@@ -76,7 +76,7 @@ int main(void)
             trace("%s creation failed!.\n", tasks[i].name);
             while (1);
         } else {
-            trace("%s creation success!.\n", tasks[i].name);
+            trace("%s creation sucdcess!.\n", tasks[i].name);
         }
         i++;
     }

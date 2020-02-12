@@ -59,9 +59,9 @@ RSTACK_SIZE = DEFINED(__resume_stack_size__)   ? __resume_stack_size__  : 0x4000
 MEMORY
 {
   m_ocram               (RWX)  : ORIGIN = 0x00900000, LENGTH = 0x00020000
-  m_interrupts          (RX)   : ORIGIN = 0x00000000, LENGTH = 0x00000040
-  m_text                (RX)   : ORIGIN = 0x00000040, LENGTH = 0x003FDFC0
-  m_data                (RW)   : ORIGIN = 0x80000000, LENGTH = 0x00400000
+  m_interrupts          (RX)   : ORIGIN = 0x80000000, LENGTH = 0x00000040
+  m_text                (RX)   : ORIGIN = 0x80000040, LENGTH = 0x003FDFC0
+  m_data                (RW)   : ORIGIN = 0x80400000, LENGTH = 0x00400000
 }
 
 /* Define output sections */

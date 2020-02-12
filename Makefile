@@ -48,21 +48,23 @@ $(SOBJS) : obj/%.o : %.S
 	$(CC) -Wall -nostdlib -c -g -O0 -mno-unaligned-access -Wall -mfloat-abi=hard -mfpu=vfpv4 -MMD -MP -fno-common -ffunction-sections -fdata-sections -ffreestanding -fno-builtin -mapcs -std=gnu99 -mcpu=cortex-a7  -DDEBUG -DCPU_MCIMX6Y2DVM05 -DFSL_RTOS_FREE_RTOS -DEVK_MCIMX6ULL $(INCLUDE) -o $@ $<
 
 $(COBJS) : obj/%.o : %.c
-
-
 	#$(CC) -Wall -nostdlib -c -O0 -g -mcpu=cortex-a7 $(INCLUDE) -o $@ $<
 	$(CC) -Wall -nostdlib -c -g -O0 -mno-unaligned-access -Wall -mfloat-abi=hard -mfpu=vfpv4 -MMD -MP -fno-common -ffunction-sections -fdata-sections -ffreestanding -fno-builtin -mapcs -std=gnu99 -mcpu=cortex-a7 -DDEBUG -DCPU_MCIMX6Y2DVM05 -DFSL_RTOS_FREE_RTOS -DEVK_MCIMX6ULL $(INCLUDE) -o $@ $<
 
-qemu: $(OBJS)
-	./qemu/bin/qemu-system-arm -M mcimx6ul-evk   -show-cursor  -m 512M -kernel 6ul_freertos.elf \
+bootloader: 
+	make -C 6ul_bootloader/
+
+boot: $(OBJS)
+	sudo cp 6ul_freertos.bin /mnt/sdcard/os.bin
+	./qemu/bin/qemu-system-arm -M mcimx6ul-evk   -show-cursor  -m 512M -kernel 6ul_bootloader/6ul_bootloader.elf \
     -display sdl -serial mon:stdio \
-    -nic user -com 100ask -sd ../testfs.img
-	 
+    -nic user -com 100ask -sd testfs.img
 
 debug: $(OBJS)
-	./qemu/bin/qemu-system-arm -M mcimx6ul-evk   -show-cursor  -m 512M -kernel 6ul_freertos.elf \
+	sudo cp 6ul_freertos.bin /mnt/sdcard/os.bin
+	./qemu/bin/qemu-system-arm -M mcimx6ul-evk   -show-cursor  -m 512M -kernel 6ul_bootloader/6ul_bootloader.elf \
     -display sdl -serial mon:stdio \
-    -nic user -com 100ask -sd ../testfs.img -s -S
+    -nic user -com 100ask -sd testfs.img -s -S
 
 clean:
 	rm -rf $(TARGET).elf $(TARGET).bin $(TARGET).dis $(OBJS) *.lst
